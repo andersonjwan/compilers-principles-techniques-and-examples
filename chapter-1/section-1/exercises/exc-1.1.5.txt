@@ -1,0 +1,3 @@
+Some tasks that an assembler needs to perform involves working with assembly code
+and translating the assembly into 'relocatable machine code' that can then easily
+be utilized by further stages in the compilation of source code.

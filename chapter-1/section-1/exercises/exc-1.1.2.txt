@@ -1,0 +1,7 @@
+a) The advantages of a compiler over an interpreter is that a compiler completely
+   translates the source language to the target language, so when running inputs
+   on the translated program, it is considered more efficient and faster.
+
+b) The advantage(s) of an interpreter of a compiler is that an interpreter can
+   usually output better error diagnostics due to its simultaneous translation
+   and execution on the inputs resulting in more accurate errors.

@@ -1,0 +1,6 @@
+The difference between a compiler and an interpreter relies fundamentally the
+relationship between when the source language is translated and when the inputs /
+outputs are processed. In a compiler, the source language is completely
+translated to its target language, and then the processing of inputs / outputs
+can be performed. In an interpreter, the source language is translated whenever
+inputs are to be run on it by the user.

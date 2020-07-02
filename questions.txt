@@ -1,0 +1,5 @@
+# 1.1.1
+
+## Why are interpreters considered "better" at recognizing source language
+   errors? (i.e. Because they are translated as they are executed, how does that
+   result in more accurate error feedback?).

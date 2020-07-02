@@ -1,0 +1,4 @@
+The advantages of using C as the target language for a compiler in a
+source-to-source translation is that the C language is of a lower-level
+base compared to other higher-level languages. (i.e. C is much closer to
+assembly language compared to Python).

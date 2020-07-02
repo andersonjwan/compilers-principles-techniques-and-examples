@@ -1,0 +1,5 @@
+A system that produces assembly rather than machine has its pros because assembly
+is considerably easier to debug and understand than machine code. Additionally,
+an assembler can be used which then translates the assembly to machine code, so
+only one extra step is necessary at the benefit of easier understanding of
+errors.

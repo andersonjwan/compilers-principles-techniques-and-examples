@@ -1,0 +1,10 @@
+1) C: imperative, von Neumann, third-generation
+2) C++: imperative, object-oriented, von Neumann, third-generation
+3) Cobol: imperative, object-oriented, third-generation
+4) Fortran: imperative, object-oriented, third-generation
+5) Java: imperative, object-oriented, third-generation
+6) Lisp: declarative, functional, third-generation
+7) ML: imperative, functional, third-generation
+8) Perl: imperative, functional, object-oriented, third-generation
+9) Python: imperative, functional, object-oriented (optionally), scripting, third-generation
+10) VB: declarative, object-oriented, fourth-generation

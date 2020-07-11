@@ -1,0 +1,6 @@
+* assuming the default value(s) are uninitialized
+
+w = 6 + 7 = 13
+x = 6 + 5 = 11
+y = 8 + 5 = 13
+z = 6 + 5 = 11

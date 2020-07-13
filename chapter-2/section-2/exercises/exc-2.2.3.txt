@@ -1,0 +1,4 @@
+The set of grammars considered ambiguous:
+    3. S -> S ( S ) S | epsilon
+    4. S -> a S b S | b S a S | epsilon
+    5. S -> a | S + S | S S | S * | ( S )

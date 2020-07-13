@@ -1,0 +1,28 @@
+a) Arithmetic Expressions in Postfix Notation
+
+   expr -> expr expr op
+   expr -> num
+
+b) Left-Associative Lists of Identifiers Separated by Commas
+   * solution from http://dragon-book.jcf94.com/book/ch02/2.2/2.2.html
+
+   list -> list , id | id
+   
+c) Right-Associative Lists of Identifiers Separated by Commas
+
+   list -> id, list | id
+   
+d) Arithmetic Expressions of Integers and Identifiers with the Four Binary Ops
+   * solution from http://dragon-book.jcf94.com/book/ch02/2.2/2.2.html
+   
+   expr -> expr - term | expr + term | term
+   term -> term * factor | term / factor | factor
+   factor -> id | num | (expr)
+   
+e) Add Unary Plus and Minus to the Arithmetic Operations of D
+   * solution from http://dragon-book.jcf94.com/book/ch02/2.2/2.2.html
+   
+   expr -> expr - term | expr + term | term
+   term -> term * unary | term / unary | unary
+   unary -> + factor | - factor | factor
+   factor -> id | num | (expr)

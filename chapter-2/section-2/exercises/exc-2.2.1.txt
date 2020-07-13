@@ -1,0 +1,23 @@
+S -> S S + | S S * | a
+
+a) aa + a *
+
+   S -> S S *
+   S -> S S + S *
+   S -> a S + S *
+   S -> a a + S *
+   S -> a a + a *
+   
+   therefore: S -> aa + a *
+   
+b) aa + a *
+
+              S
+         /    |    \
+        S     S     *
+      / | \   |
+     S  S  +  a
+    /   |
+   a    a
+
+c) This grammar generates the language of postfix arithmetic operations.

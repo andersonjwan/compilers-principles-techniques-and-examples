@@ -1,0 +1,5 @@
+a) num -> 11 | 1001 | num 0 | num num
+
+   > ...
+   
+b) Yes, the grammar generates all binary numbers divisible by 3.

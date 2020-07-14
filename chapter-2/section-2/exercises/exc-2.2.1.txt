@@ -12,12 +12,13 @@ a) aa + a *
    
 b) aa + a *
 
-              S
-         /    |    \
-        S     S     *
-      / | \   |
-     S  S  +  a
-    /   |
-   a    a
+            S
+       /    |    \
+      S     S     *
+    / | \   |
+   S  S  +  a
+   |  |
+   a  a
 
-c) This grammar generates the language of postfix arithmetic operations.
+c) This grammar generates the language of postfix arithmetic operations
+   consisting of addition and multiplication.

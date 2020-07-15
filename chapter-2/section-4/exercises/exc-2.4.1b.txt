@@ -1,0 +1,14 @@
+Grammar: S -> S ( S ) S | epsilon
+
+void parse_s(void) {
+    switch(lookahead) {
+    case (: {
+        match(();
+        parse_s();
+
+        match());
+        parse_s();
+        break;
+    }
+    }
+}

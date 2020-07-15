@@ -1,0 +1,12 @@
+Grammar: S -> 0 S 1 | 0 1
+
+void parse_s(void) {
+     switch(lookahead) {
+     case 0: {
+         match(0);
+         parse_s();
+         match(1);
+         break;
+     }
+     }
+}

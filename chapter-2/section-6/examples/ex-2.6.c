@@ -81,6 +81,7 @@ Token scan(void) {
     t->tag = NUM;
     t->line = line;
     t->value = v;
+    t->lexeme = NULL;
 
     return *t;
   }
@@ -138,11 +139,16 @@ Token scan(void) {
     return *t;
   }
 
-  Token t;
-  t.tag = peek;
+  Token *t = (Token *) malloc(sizeof(Token));
+
+  t->tag = peek;
+  t->line = line;
+  t->value = 0;
+  t->lexeme = NULL;
+
   peek = ' '; // reset peek to blank-space
 
-  return t;
+  return *t;
 }
 
 int main(void) {
@@ -157,40 +163,14 @@ int main(void) {
   keyword_2.lexeme = "false";
   reserve(&keyword_2, keyword_2.lexeme);
 
+  Token t;
   while(1) {
-    scan();
-
-    for(int i = 0; i < next_token; ++i) {
-      /* print Token tag */
-      printf("Token Tag: ");
-      if(tokens[i]->tag == NUM) {
-        printf("NUM\n");
-      }
-      else if(tokens[i]->tag == ID) {
-        printf("ID\n");
-      }
-      else if(tokens[i]->tag == TRUE) {
-        printf("TRUE\n");
-      }
-      else if(tokens[i]->tag == FALSE) {
-        printf("FALSE\n");
-      }
-      else {
-        printf("NO MATCHING TAG\n");
-      }
-
-      if(tokens[i]->tag == NUM) {
-        printf("Token Value: %d\n", tokens[i]->value);
-      }
-      else if(tokens[i]->tag == ID || tokens[i]->tag == TRUE || tokens[i]->tag == FALSE) {
-        printf("Token Lexeme: %s\n", tokens[i]->lexeme);
-      }
-      else {
-        printf("NO MATCHING VALUE / LEXEME");
-      }
-
-      printf("----------\n");
-    }
+    t = scan();
+    printf("Token Tag: %d\n", t.tag);
+    printf("Token Line Number: %d\n", t.line);
+    printf("Token Value: %d\n", t.value);
+    printf("Token Lexeme: %s\n", t.lexeme);
+    printf("----------\n");
   }
 
   return 0;

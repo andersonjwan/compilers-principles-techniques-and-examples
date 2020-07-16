@@ -99,6 +99,9 @@ Token scan(void) {
     t.line = line;
     t.lexeme = buffer;
 
+    // TODO: implement hastable
+    // TODO: build hashtable that maps lexemes to tokens
+    // TODO: map new Token into hashtable
   }
 }
 

@@ -10,7 +10,7 @@ void match(int token) {
     lookahead = getchar(); // next token
   }
   else {
-    printf("syntax error\n");
+    fprintf(stderr, "Syntax Error : %c\n", lookahead);
     exit(1);
   }
 }
@@ -23,7 +23,7 @@ void term(void) {
     match(lookahead);
   }
   else {
-    printf("syntax error\n");
+    fprintf(stderr, "Syntax Error : %c\n", lookahead);
     exit(1);
   }
 }

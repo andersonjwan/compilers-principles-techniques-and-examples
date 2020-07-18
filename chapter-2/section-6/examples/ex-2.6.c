@@ -65,7 +65,7 @@ Token scan(void) {
     }
   }
 
-  /* non-whitespace / tab / newline met */
+  /* NUM */
   if(peek >= 48 && peek <= 57) {
     /* peek is digit */
 
@@ -86,6 +86,7 @@ Token scan(void) {
     return *t;
   }
 
+  /* ID */
   if((peek >= 65 && peek <= 90) || (peek >= 97 && peek <= 122)) {
     /* peek is a letter (uppercase OR lowercase) */
     int size = 2, next_char = 0;
@@ -139,6 +140,7 @@ Token scan(void) {
     return *t;
   }
 
+  /* create and return current character as Token */
   Token *t = (Token *) malloc(sizeof(Token));
 
   t->tag = peek;

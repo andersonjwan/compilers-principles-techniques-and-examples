@@ -60,41 +60,30 @@ Token scan(void) {
     else if(peek == '\n') {
       line = line + 1; // next line
     }
+    else if(peek == '/') {
+      /* start of new comment */
+      peek = (char) getchar();
+
+      if(peek == '/') {
+        /* single-lined comment */
+        for( ; ; peek = (char) getchar()) {
+          if(peek == '\n') {
+            line = line + 1; // next line
+            break;           // break nested for loop
+          }
+        }
+      }
+      else {
+        fprintf(stderr, "Syntax Error : Comment Expected\n");
+        exit(2);
+      }
+    }
     else {
       break;
     }
   }
 
-  /* iterate until end of comment */
-  if(peek == '/') {
-    char temp = getchar();
-
-    if(temp == '/') {
-      /* comment exists */
-      for( ; ; peek = getchar()) {
-        if(peek == '\n') {
-          line = line + 1;
-
-          peek = getchar();
-          break;
-        }
-      }
-    }
-    else {
-      peek = '/';
-      Token *t = (Token *) malloc(sizeof(Token));
-
-      t->tag = peek;
-      t->line = line;
-      t->value = 0;
-      t->lexeme = NULL;
-
-      peek = temp;
-      return *t;
-    }
-  }
-
-  /* non-whitespace / tab / newline met */
+  /* NUM */
   if(peek >= 48 && peek <= 57) {
     /* peek is digit */
 
@@ -112,9 +101,10 @@ Token scan(void) {
     t->value = v;
     t->lexeme = NULL;
 
-    return *t;
+    return *t;                // RETURN TOKEN
   }
 
+  /* ID */
   if((peek >= 65 && peek <= 90) || (peek >= 97 && peek <= 122)) {
     /* peek is a letter (uppercase OR lowercase) */
     int size = 2, next_char = 0;
@@ -165,10 +155,10 @@ Token scan(void) {
     t->lexeme = buffer;
 
     put(buffer, t);
-    return *t;
+    return *t;                // RETURN TOKEN
   }
 
-  /* default unmatching token */
+  /* create and return current character as Token */
   Token *t = (Token *) malloc(sizeof(Token));
 
   t->tag = peek;
@@ -178,7 +168,7 @@ Token scan(void) {
 
   peek = ' '; // reset peek to blank-space
 
-  return *t;
+  return *t;                  // RETURN TOKEN
 }
 
 int main(void) {

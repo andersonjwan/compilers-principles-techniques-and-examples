@@ -61,21 +61,28 @@ Token scan(void) {
       line = line + 1; // next line
     }
     else if(peek == '/') {
-      /* start of new comment */
+      /* COMMENT(S) */
+      char prev = peek;
       peek = (char) getchar();
 
-      if(peek == '/') {
+      if(prev == '/' && peek == '/') {
         /* single-lined comment */
         for( ; ; peek = (char) getchar()) {
           if(peek == '\n') {
-            line = line + 1; // next line
-            break;           // break nested for loop
+            line = line + 1;
+            break;
           }
         }
       }
       else {
-        fprintf(stderr, "Syntax Error : Comment Expected\n");
-        exit(2);
+        /* create and return previous character as token */
+        Token *t = (Token *) malloc(sizeof(Token));
+        t->tag = prev;
+        t->line = line;
+        t->value = 0;
+        t->lexeme = NULL;
+
+        return *t;
       }
     }
     else {

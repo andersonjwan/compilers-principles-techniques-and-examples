@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ex-2.6.h"
+#include "hash-table.h"
+
 /* terminal(s) */
 enum terminals {NUM = 256, ID, TRUE, FALSE};
 
@@ -9,46 +12,10 @@ enum terminals {NUM = 256, ID, TRUE, FALSE};
 static int line = 1;
 static char peek = ' '; // blank-space initially
 
-/* data structure(s) */
-typedef struct Tokens {
-  int tag;      // used for parsing decisions (i.e. terminal)
-  int line;  // line number token on
+static ht_table *words;
 
-  int value;    // integer values
-  char *lexeme; // reserved words and/or identifiers
-} Token;
-
-char *words[1000];        // string table for keywords and identifiers
-int next_word = 0;        // next available word
-
-Token *tokens[1000];       // token table for all tokens
-int next_token = 0;       // next available token
-
-void reserve(Token *t, char *string) {
-  words[next_word] = string;
-  ++next_word;
-
-  tokens[next_token] = t;
-  ++next_token;
-}
-
-Token * get(char *string) {
-  for(int i = 0; i < next_word; ++i) {
-    if(strcmp(string, words[i]) == 0) {
-      /* lexeme exist in table */
-      return tokens[next_token];
-    }
-  }
-
-  return NULL;
-}
-
-void put(char *string, Token *t) {
-  words[next_word] = string;
-  ++next_word;
-
-  tokens[next_token] = t;
-  ++next_token;
+void reserve(Token *t) {
+  ht_insert(words, t->lexeme, t);
 }
 
 Token scan(void) {
@@ -123,7 +90,7 @@ Token scan(void) {
     buffer[next_char] = '\0';
 
     /* check existence of token */
-    Token *t = (Token *) get(buffer);
+    Token *t = (Token *) ht_search(words, buffer);
 
     if(t != NULL) {
       return *t;
@@ -136,7 +103,7 @@ Token scan(void) {
     t->line = line;
     t->lexeme = buffer;
 
-    put(buffer, t);
+    ht_insert(words, buffer, t);
     return *t;
   }
 
@@ -154,16 +121,18 @@ Token scan(void) {
 }
 
 int main(void) {
+  words = ht_table_new(TOKENS);
+
   /* setup reserved words */
   Token keyword_1, keyword_2;
 
   keyword_1.tag = TRUE;
   keyword_1.lexeme = "true";
-  reserve(&keyword_1, keyword_1.lexeme);
+  reserve(&keyword_1);
 
   keyword_2.tag = FALSE;
   keyword_2.lexeme = "false";
-  reserve(&keyword_2, keyword_2.lexeme);
+  reserve(&keyword_2);
 
   Token t;
   while(1) {
@@ -173,6 +142,8 @@ int main(void) {
     printf("Token Value: %d\n", t.value);
     printf("Token Lexeme: %s\n", t.lexeme);
     printf("----------\n");
+
+    printf("Size: %d\n", (int) words->size);
   }
 
   return 0;

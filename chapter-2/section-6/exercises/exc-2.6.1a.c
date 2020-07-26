@@ -164,26 +164,24 @@ void garbage_collector(void *value) {
 int main(void) {
   words = new_hash_table(garbage_collector);
 
-  /* setup reserved words */
-  Token keyword_1, keyword_2;
-
-  keyword_1.tag = TRUE;
-  keyword_1.lexeme = "true";
-  reserve(&keyword_1, keyword_1.lexeme);
-
-  keyword_2.tag = FALSE;
-  keyword_2.lexeme = "false";
-  reserve(&keyword_2, keyword_2.lexeme);
-
   Token t;
   while(t.tag != EOF) {
     t = scan();
+
+    if(t.lexeme != NULL) {
+      if(strcmp(t.lexeme, "EXIT") == 0) {
+        break;
+      }
+    }
+
     printf("Token Tag: %d\n", t.tag);
     printf("Token Line Number: %d\n", t.line);
     printf("Token Value: %d\n", t.value);
     printf("Token Lexeme: %s\n", t.lexeme);
     printf("----------\n");
   }
+
+  del_hash_table(words);
 
   return 0;
 }

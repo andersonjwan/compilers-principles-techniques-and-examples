@@ -181,6 +181,7 @@ int main(void) {
     printf("----------\n");
   }
 
+  hash_print(words);
   del_hash_table(words);
 
   return 0;

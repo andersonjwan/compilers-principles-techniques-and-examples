@@ -2,20 +2,27 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ex-2.6.h"
-#include "hash-table.h"
+#include "hash.h"
 
 /* terminal(s) */
 enum terminals {NUM = 256, ID, TRUE, FALSE};
+
+typedef struct Tokens {
+  int tag;      // used for parsing decisions (i.e. terminal)
+  int line;     // line number token on
+
+  int value;    // integer values
+  char *lexeme; // reserved words and/or identifiers
+} Token;
 
 /* global(s) */
 static int line = 1;
 static char peek = ' '; // blank-space initially
 
-static ht_table *words;
+static hash_table *words;
 
 void reserve(Token *t) {
-  ht_insert(words, t->lexeme, t);
+  hash_insert(words, t->lexeme, t);
 }
 
 Token scan(void) {
@@ -35,7 +42,6 @@ Token scan(void) {
   /* NUM */
   if(peek >= 48 && peek <= 57) {
     /* peek is digit */
-
     int v = 0;
     do {
       v = v * 10 + (peek - 48);      // v * 10 + integer value of peek
@@ -43,14 +49,15 @@ Token scan(void) {
     }
     while(peek >= 48 && peek <= 57); // while peek is a digit
 
+    printf("VALUE: %d\n", v);
     /* create and return new token */
-    Token *t = (Token *) malloc(sizeof(Token));
-    t->tag = NUM;
-    t->line = line;
-    t->value = v;
-    t->lexeme = NULL;
+    Token t;
+    t.tag = NUM;
+    t.line = line;
+    t.value = v;
+    t.lexeme = NULL;
 
-    return *t;
+    return t;
   }
 
   /* ID */
@@ -90,7 +97,7 @@ Token scan(void) {
     buffer[next_char] = '\0';
 
     /* check existence of token */
-    Token *t = (Token *) ht_search(words, buffer);
+    Token *t = (Token *) hash_search(words, buffer);
 
     if(t != NULL) {
       return *t;
@@ -103,48 +110,64 @@ Token scan(void) {
     t->line = line;
     t->lexeme = buffer;
 
-    ht_insert(words, buffer, t);
+    hash_insert(words, buffer, t);
     return *t;
   }
 
   /* create and return current character as Token */
-  Token *t = (Token *) malloc(sizeof(Token));
+  Token t;
 
-  t->tag = peek;
-  t->line = line;
-  t->value = 0;
-  t->lexeme = NULL;
+  t.tag = peek;
+  t.line = line;
+  t.value = 0;
+  t.lexeme = NULL;
 
   peek = ' '; // reset peek to blank-space
 
-  return *t;
+  return t;
+}
+
+void garbage_collector(void *value) {
+  Token *tmp;
+  tmp = (Token *) value;
+
+  free(tmp->lexeme);
+  free(tmp);
 }
 
 int main(void) {
-  words = ht_table_new(TOKENS);
+  words = new_hash_table(garbage_collector);
 
   /* setup reserved words */
-  Token keyword_1, keyword_2;
+  Token *keyword_1, *keyword_2;
+  keyword_1 = (Token *) malloc(sizeof(Token));
+  keyword_2 = (Token *) malloc(sizeof(Token));
 
-  keyword_1.tag = TRUE;
-  keyword_1.lexeme = "true";
-  reserve(&keyword_1);
+  keyword_1->tag = TRUE;
+  keyword_1->lexeme = (char *) malloc(sizeof(char) * 5);
+  strcpy(keyword_1->lexeme, "true");
 
-  keyword_2.tag = FALSE;
-  keyword_2.lexeme = "false";
-  reserve(&keyword_2);
+  reserve(keyword_1);
+
+  keyword_2->tag = FALSE;
+  keyword_2->lexeme = (char *) malloc(sizeof(char) * 6);
+  strcpy(keyword_2->lexeme, "false");
+
+  reserve(keyword_2);
 
   Token t;
   while(1) {
     t = scan();
-    printf("Token Tag: %d\n", t.tag);
-    printf("Token Line Number: %d\n", t.line);
-    printf("Token Value: %d\n", t.value);
-    printf("Token Lexeme: %s\n", t.lexeme);
-    printf("----------\n");
+    hash_print(words);
 
-    printf("Size: %d\n", (int) words->size);
+    if(t.lexeme != NULL ) {
+      if(strcmp(t.lexeme, "EXIT") == 0) {
+        break;
+      }
+    }
   }
+
+  del_hash_table(words);
 
   return 0;
 }

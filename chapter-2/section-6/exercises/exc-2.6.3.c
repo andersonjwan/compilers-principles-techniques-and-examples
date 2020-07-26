@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "hash.h"
+
 /* terminal(s) */
 enum terminals {
                 NUM = 256, ID = 257, TRUE = 258, FALSE = 259,
@@ -12,6 +14,7 @@ enum terminals {
 /* global(s) */
 static int line = 1;
 static char peek = ' '; // blank-space initially
+static hash_table *words;
 
 /* data structure(s) */
 typedef struct Tokens {
@@ -23,37 +26,8 @@ typedef struct Tokens {
   char *lexeme;    // reserved words and/or identifiers
 } Token;
 
-char *words[1000];        // string table for keywords and identifiers
-int next_word = 0;        // next available word
-
-Token *tokens[1000];       // token table for all tokens
-int next_token = 0;       // next available token
-
 void reserve(Token *t, char *string) {
-  words[next_word] = string;
-  ++next_word;
-
-  tokens[next_token] = t;
-  ++next_token;
-}
-
-Token * get(char *string) {
-  for(int i = 0; i < next_word; ++i) {
-    if(strcmp(string, words[i]) == 0) {
-      /* lexeme exist in table */
-      return tokens[next_token];
-    }
-  }
-
-  return NULL;
-}
-
-void put(char *string, Token *t) {
-  words[next_word] = string;
-  ++next_word;
-
-  tokens[next_token] = t;
-  ++next_token;
+  hash_insert(words, string, t);
 }
 
 Token scan(void) {
@@ -99,13 +73,13 @@ Token scan(void) {
       }
       else {
         /* create and return previous character as token */
-        Token *t = (Token *) malloc(sizeof(Token));
-        t->tag = prev;
-        t->line = line;
-        t->value = 0;
-        t->lexeme = NULL;
+        Token t;
+        t.tag = prev;
+        t.line = line;
+        t.value = 0;
+        t.lexeme = NULL;
 
-        return *t;
+        return t;
       }
     }
     else {
@@ -128,24 +102,26 @@ Token scan(void) {
     if(peek == '.') {
       /* fraction */
       peek = getchar();
-      do {
-        w = w + (factor * (float) (peek - 48));
+      if(peek >= 48 && peek <= 57) {
+        do {
+          w = w + (factor * (float) (peek - 48));
 
-        factor = factor * (1.0 / 10.0);
-        peek = getchar();        // next character
+          factor = factor * (1.0 / 10.0);
+          peek = getchar();        // next character
+        }
+        while(peek >= 48 && peek <= 57); // while peek is a digit
       }
-      while(peek >= 48 && peek <= 57); // while peek is a digit
     }
 
     /* create and return new token */
-    Token *t = (Token *) malloc(sizeof(Token));
-    t->tag = NUM;
-    t->line = line;
-    t->value = v;
-    t->fraction = w;
-    t->lexeme = NULL;
+    Token t;
+    t.tag = NUM;
+    t.line = line;
+    t.value = v;
+    t.fraction = w;
+    t.lexeme = NULL;
 
-    return *t;                // RETURN TOKEN
+    return t;                // RETURN TOKEN
   }
 
   /* ID */
@@ -185,7 +161,7 @@ Token scan(void) {
     buffer[next_char] = '\0';
 
     /* check existence of token */
-    Token *t = (Token *) get(buffer);
+    Token *t = hash_search(words, buffer);
 
     if(t != NULL) {
       return *t;
@@ -198,7 +174,7 @@ Token scan(void) {
     t->line = line;
     t->lexeme = buffer;
 
-    put(buffer, t);
+    hash_insert(words, buffer, t);
     return *t;                // RETURN TOKEN
   }
 
@@ -207,113 +183,121 @@ Token scan(void) {
     char prev = peek;
     peek = (char) getchar();
 
-    Token *t = (Token *) malloc(sizeof(Token));
+    Token t;
 
     if(prev == '<') {
       if(peek == '=') {
         /* less than or equal */
-        t->tag = LESS_THAN_EQUAL;
-        t->line = line;
-        t->value = 0;
-        t->lexeme = NULL;
+        t.tag = LESS_THAN_EQUAL;
+        t.line = line;
+        t.value = 0;
+        t.lexeme = NULL;
 
         peek = ' ';
-        return *t;
+        return t;
       }
       else {
         /* less than */
-        t->tag = LESS_THAN;
-        t->line = line;
-        t->value = 0;
-        t->lexeme = NULL;
+        t.tag = LESS_THAN;
+        t.line = line;
+        t.value = 0;
+        t.lexeme = NULL;
 
         peek = ' ';
-        return *t;
+        return t;
       }
     }
     else if(prev == '>') {
       if(peek == '=') {
         /* greater than or equal */
-        t->tag = GREATER_THAN_EQUAL;
-        t->line = line;
-        t->value = 0;
-        t->lexeme = NULL;
+        t.tag = GREATER_THAN_EQUAL;
+        t.line = line;
+        t.value = 0;
+        t.lexeme = NULL;
 
         peek = ' ';
-        return *t;
+        return t;
       }
       else {
         /* greater than */
-        t->tag = GREATER_THAN;
-        t->line = line;
-        t->value = 0;
-        t->lexeme = NULL;
+        t.tag = GREATER_THAN;
+        t.line = line;
+        t.value = 0;
+        t.lexeme = NULL;
 
         peek = ' ';
-        return *t;
+        return t;
       }
     }
     else if(prev == '=') {
       if(peek == '=') {
         /* equal */
-        t->tag = EQUAL;
-        t->line = line;
-        t->value = 0;
-        t->lexeme = NULL;
+        t.tag = EQUAL;
+        t.line = line;
+        t.value = 0;
+        t.lexeme = NULL;
 
         peek = ' ';
-        return *t;
+        return t;
       }
     }
     else if(prev == '!') {
       if(peek == '=') {
         /* not equal */
-        t->tag = NOT_EQUAL;
-        t->line = line;
-        t->value = 0;
-        t->lexeme = NULL;
+        t.tag = NOT_EQUAL;
+        t.line = line;
+        t.value = 0;
+        t.lexeme = NULL;
 
         peek = ' ';
-        return *t;
+        return t;
       }
     }
   }
 
   /* create and return current character as Token */
-  Token *t = (Token *) malloc(sizeof(Token));
+  Token t;
 
-  t->tag = peek;
-  t->line = line;
-  t->value = 0;
-  t->lexeme = NULL;
+  t.tag = peek;
+  t.line = line;
+  t.value = 0;
+  t.lexeme = NULL;
 
   peek = ' '; // reset peek to blank-space
+  return t;                  // RETURN TOKEN
+}
 
-  return *t;                  // RETURN TOKEN
+void garbage_collector(void *value) {
+  Token *tmp;
+  tmp = (Token *) value;
+
+  free(tmp->lexeme);
+  free(tmp);
 }
 
 int main(void) {
-  /* setup reserved words */
-  Token keyword_1, keyword_2;
-
-  keyword_1.tag = TRUE;
-  keyword_1.lexeme = "true";
-  reserve(&keyword_1, keyword_1.lexeme);
-
-  keyword_2.tag = FALSE;
-  keyword_2.lexeme = "false";
-  reserve(&keyword_2, keyword_2.lexeme);
+  words = new_hash_table(garbage_collector);
 
   Token t;
   while(t.tag != EOF) {
     t = scan();
+
+    if(t.lexeme != NULL) {
+      if(strcmp(t.lexeme, "EXIT") == 0) {
+        break;
+      }
+    }
+
     printf("Token Tag: %d\n", t.tag);
     printf("Token Line Number: %d\n", t.line);
     printf("Token Value: %d\n", t.value);
-    printf("Token Float: %f\n", t.fraction);
+    printf("Token Fraction: %f\n", t.fraction);
     printf("Token Lexeme: %s\n", t.lexeme);
     printf("----------\n");
   }
+
+  hash_print(words);
+  del_hash_table(words);
 
   return 0;
 }
